@@ -5,7 +5,6 @@ import time
 import os
 from datetime import datetime
 
-# ── Config ──
 TELEGRAM_TOKEN   = os.environ.get("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 LEGIN_PCT        = float(os.environ.get("LEGIN_PCT", "70"))
@@ -13,9 +12,6 @@ BASE_PCT         = float(os.environ.get("BASE_PCT", "50"))
 LEGOUT_MUL       = float(os.environ.get("LEGOUT_MUL", "1.0"))
 SCAN_INTERVAL    = int(os.environ.get("SCAN_INTERVAL", "60"))
 
-# ══════════════════════════════════
-# SYMBOL LISTS
-# ══════════════════════════════════
 NIFTY100_SYMBOLS = [
     "RELIANCE.NS","TCS.NS","HDFCBANK.NS","INFY.NS","ICICIBANK.NS",
     "HINDUNILVR.NS","SBIN.NS","BHARTIARTL.NS","ITC.NS","KOTAKBANK.NS",
@@ -39,7 +35,6 @@ NIFTY100_SYMBOLS = [
     "ASHOKLEY.NS","TVSMOTOR.NS","BALKRISIND.NS","JUBLFOOD.NS",
     "^NSEI","^BSESN"
 ]
-
 US100_SYMBOLS = [
     "AAPL","MSFT","NVDA","AMZN","META","GOOGL","GOOG","TSLA","AVGO","COST",
     "NFLX","ASML","AMD","PEP","ADBE","QCOM","CSCO","TMUS","TXN","AMAT",
@@ -52,7 +47,6 @@ US100_SYMBOLS = [
     "ORCL","CRM","NOW","VEEV","HUBS","BILL","MDB","ESTC","CFLT","GTLB",
     "SPY","QQQ","DIA","IWM"
 ]
-
 FOREX_SYMBOLS = [
     "EURUSD=X","GBPUSD=X","USDJPY=X","USDCHF=X","AUDUSD=X","USDCAD=X","NZDUSD=X",
     "EURGBP=X","EURJPY=X","EURCHF=X","EURAUD=X","EURCAD=X","EURNZD=X",
@@ -61,75 +55,39 @@ FOREX_SYMBOLS = [
     "CADJPY=X","CADCHF=X","NZDJPY=X","NZDCHF=X","NZDCAD=X","CHFJPY=X",
     "USDINR=X","USDSGD=X","USDMXN=X","USDZAR=X","USDTRY=X"
 ]
-
-COMMODITY_SYMBOLS = [
-    "GC=F","SI=F","CL=F","BZ=F","NG=F","HG=F","BTC-USD"
-]
+COMMODITY_SYMBOLS = ["GC=F","SI=F","CL=F","BZ=F","NG=F","HG=F","BTC-USD"]
 
 NAME_MAP = {
-    "GC=F":"XAUUSD","SI=F":"XAGUSD","CL=F":"WTI_OIL",
-    "BZ=F":"BRENT","NG=F":"NAT_GAS","HG=F":"COPPER",
-    "BTC-USD":"BTCUSD","^NSEI":"NIFTY50","^BSESN":"SENSEX",
+    "GC=F":"XAUUSD","SI=F":"XAGUSD","CL=F":"WTI_OIL","BZ=F":"BRENT",
+    "NG=F":"NAT_GAS","HG=F":"COPPER","BTC-USD":"BTCUSD",
+    "^NSEI":"NIFTY50","^BSESN":"SENSEX",
     "SPY":"SP500","QQQ":"NASDAQ","DIA":"DOW","IWM":"RUSSELL"
 }
+def dn(sym): return NAME_MAP.get(sym, sym.replace(".NS","").replace("=X","").replace("-USD","USD").replace("=F",""))
 
-def display_name(sym):
-    return NAME_MAP.get(sym, sym.replace(".NS","").replace("=X","").replace("-USD","USD").replace("=F",""))
-
-# ══════════════════════════════════
-# CUSTOM TIMEFRAME RESAMPLING
-# ══════════════════════════════════
-# base_tf -> fetch this from yfinance
-# then resample to custom minutes
 CUSTOM_TIMEFRAMES = {
-    "15m" : {"fetch":"15m",  "resample":None,  "period":"2d"},
-    "30m" : {"fetch":"30m",  "resample":None,  "period":"5d"},
-    "75m" : {"fetch":"15m",  "resample":"75T", "period":"5d"},
-    "125m": {"fetch":"5m",   "resample":"125T","period":"5d"},
-    "1h"  : {"fetch":"1h",   "resample":None,  "period":"7d"},
-    "2h"  : {"fetch":"1h",   "resample":"2h",  "period":"10d"},
-    "4h"  : {"fetch":"1h",   "resample":"4h",  "period":"15d"},
-    "5h"  : {"fetch":"1h",   "resample":"5h",  "period":"20d"},
-    "6h"  : {"fetch":"1h",   "resample":"6h",  "period":"20d"},
-    "8h"  : {"fetch":"1h",   "resample":"8h",  "period":"30d"},
-    "10h" : {"fetch":"1h",   "resample":"10h", "period":"30d"},
-    "16h" : {"fetch":"1h",   "resample":"16h", "period":"40d"},
-    "1d"  : {"fetch":"1d",   "resample":None,  "period":"60d"},
-    "1wk" : {"fetch":"1wk",  "resample":None,  "period":"1y"},
+    "5m"  : {"fetch":"5m",  "resample":None,  "period":"1d"},
+    "15m" : {"fetch":"15m", "resample":None,  "period":"2d"},
+    "30m" : {"fetch":"30m", "resample":None,  "period":"5d"},
+    "75m" : {"fetch":"15m", "resample":"75T", "period":"5d"},
+    "125m": {"fetch":"5m",  "resample":"125T","period":"5d"},
+    "1h"  : {"fetch":"1h",  "resample":None,  "period":"7d"},
+    "2h"  : {"fetch":"1h",  "resample":"2h",  "period":"10d"},
+    "4h"  : {"fetch":"1h",  "resample":"4h",  "period":"15d"},
+    "5h"  : {"fetch":"1h",  "resample":"5h",  "period":"20d"},
+    "6h"  : {"fetch":"1h",  "resample":"6h",  "period":"20d"},
+    "8h"  : {"fetch":"1h",  "resample":"8h",  "period":"30d"},
+    "10h" : {"fetch":"1h",  "resample":"10h", "period":"30d"},
+    "16h" : {"fetch":"1h",  "resample":"16h", "period":"40d"},
+    "1d"  : {"fetch":"1d",  "resample":None,  "period":"60d"},
+    "1wk" : {"fetch":"1wk", "resample":None,  "period":"1y"},
 }
+INDIAN_TF     = ["5m","15m","75m","125m","2h","4h","1d","1wk"]
+NON_INDIAN_TF = ["15m","30m","75m","125m","1h","2h","4h","5h","6h","8h","10h","16h","1d","1wk"]
 
-ALL_TIMEFRAMES = list(CUSTOM_TIMEFRAMES.keys())
-
-def resample_df(df, rule):
-    """Resample OHLCV dataframe to custom timeframe"""
-    df_resampled = df.resample(rule).agg({
-        "Open" : "first",
-        "High" : "max",
-        "Low"  : "min",
-        "Close": "last",
-        "Volume":"sum"
-    }).dropna()
-    return df_resampled
-
-def fetch(symbol, tf_key):
-    cfg = CUSTOM_TIMEFRAMES[tf_key]
-    try:
-        df = yf.Ticker(symbol).history(period=cfg["period"], interval=cfg["fetch"])
-        if df.empty: return None
-        df = df[["Open","High","Low","Close","Volume"]].dropna()
-        if cfg["resample"]:
-            df = resample_df(df, cfg["resample"])
-        return df if len(df) >= 3 else None
-    except:
-        return None
-
-# ── State ──
 alerted      = set()
 active_zones = {}
 
-# ══════════════════════════════════
-# HELPERS
-# ══════════════════════════════════
 def body(r):     return abs(r["Close"] - r["Open"])
 def rng(r):      return r["High"] - r["Low"]
 def body_pct(r): return body(r) / rng(r) * 100 if rng(r) != 0 else 0
@@ -138,6 +96,53 @@ def is_bear(r):  return r["Close"] <  r["Open"]
 def bbhigh(r):   return max(r["Open"], r["Close"])
 def bblow(r):    return min(r["Open"], r["Close"])
 
+def calc_entry_sl(bs, zone_type):
+    """
+    DEMAND:
+      Base Green → Proximal(Entry) = base body HIGH | Distal(SL) = base candle LOW
+      Base Red   → Proximal(Entry) = base OPEN      | Distal(SL) = base candle LOW
+    SUPPLY:
+      Base Red   → Proximal(Entry) = base body LOW  | Distal(SL) = base candle HIGH
+      Base Green → Proximal(Entry) = base OPEN      | Distal(SL) = base candle HIGH
+    """
+    bbh = bbhigh(bs)
+    bbl = bblow(bs)
+    base_bull = is_bull(bs)
+
+    if zone_type == "DEMAND":
+        proximal = bbh if base_bull else bs["Open"]
+        distal   = bs["Low"]
+    else:  # SUPPLY
+        proximal = bbl if not base_bull else bs["Open"]
+        distal   = bs["High"]
+
+    return round(proximal, 6), round(distal, 6)
+
+def calc_strength(lg, bs, lo):
+    ls = body_pct(lg) / 100
+    os_ = min(body(lo) / body(lg), 3.0) / 3.0
+    bs_ = 1 - (body_pct(bs) / 100)
+    return round(min(max((ls + os_ + bs_) / 3 * 5, 1), 5), 1)
+
+def strength_stars(s):
+    f = int(round(s))
+    return "⭐" * f + "☆" * (5 - f)
+
+def resample_df(df, rule):
+    return df.resample(rule).agg({"Open":"first","High":"max","Low":"min","Close":"last","Volume":"sum"}).dropna()
+
+def fetch(symbol, tf_key):
+    cfg = CUSTOM_TIMEFRAMES.get(tf_key)
+    if not cfg: return None
+    try:
+        df = yf.Ticker(symbol).history(period=cfg["period"], interval=cfg["fetch"])
+        if df.empty: return None
+        df = df[["Open","High","Low","Close","Volume"]].dropna()
+        if cfg["resample"]:
+            df = resample_df(df, cfg["resample"])
+        return df if len(df) >= 3 else None
+    except: return None
+
 def detect_latest(df):
     if len(df) < 3: return None
     lg = df.iloc[-3]
@@ -145,14 +150,30 @@ def detect_latest(df):
     lo = df.iloc[-1]
     if not (body_pct(lg) >= LEGIN_PCT and body_pct(bs) < BASE_PCT and body(lo) >= body(lg) * LEGOUT_MUL):
         return None
-    if   is_bull(lg) and is_bull(lo): pat,zt,ep,sl = "RBR","DEMAND",bblow(bs), bbhigh(bs)
-    elif is_bull(lg) and is_bear(lo): pat,zt,ep,sl = "RBD","SUPPLY",bbhigh(bs),bblow(bs)
-    elif is_bear(lg) and is_bear(lo): pat,zt,ep,sl = "DBD","SUPPLY",bbhigh(bs),bblow(bs)
-    elif is_bear(lg) and is_bull(lo): pat,zt,ep,sl = "DBR","DEMAND",bblow(bs), bbhigh(bs)
+    if   is_bull(lg) and is_bull(lo): pat, zt = "RBR", "DEMAND"
+    elif is_bull(lg) and is_bear(lo): pat, zt = "RBD", "SUPPLY"
+    elif is_bear(lg) and is_bear(lo): pat, zt = "DBD", "SUPPLY"
+    elif is_bear(lg) and is_bull(lo): pat, zt = "DBR", "DEMAND"
     else: return None
-    return {"pattern":pat,"zone_type":zt,"entry":round(ep,6),"sl":round(sl,6),
-            "zone_high":round(bs["High"],6),"zone_low":round(bs["Low"],6),
-            "legout_time":str(lo.name)}
+
+    proximal, distal = calc_entry_sl(bs, zt)
+    strength = calc_strength(lg, bs, lo)
+    base_color = "🟢 Green" if is_bull(bs) else "🔴 Red"
+
+    return {
+        "pattern"     : pat,
+        "zone_type"   : zt,
+        "proximal"    : proximal,
+        "distal"      : distal,
+        "zone_high"   : round(bs["High"], 6),
+        "zone_low"    : round(bs["Low"],  6),
+        "strength"    : strength,
+        "base_count"  : 1,
+        "legout_count": 1,
+        "fresh"       : True,
+        "base_color"  : base_color,
+        "legout_time" : str(lo.name),
+    }
 
 def send(text):
     try:
@@ -162,35 +183,57 @@ def send(text):
         print(f"[SEND ERROR] {e}")
 
 def pat_msg(sym, tf, p):
-    e   = "🟢" if p["zone_type"]=="DEMAND" else "🔴"
-    dn  = display_name(sym)
-    dir = "📈 BUY Zone" if p["zone_type"]=="DEMAND" else "📉 SELL Zone"
-    return (f"{e} <b>{p['pattern']} Pattern Formed!</b>\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"📊 Symbol    : <b>{dn}</b>\n"
-            f"⏱ Timeframe : <b>{tf}</b>\n"
-            f"🎯 Type      : <b>{dir}</b>\n"
-            f"━━━━━━━━━━━━━━━━\n"
-            f"📍 Entry     : <b>{p['entry']}</b>\n"
-            f"🛑 SL        : <b>{p['sl']}</b>\n"
-            f"📦 Zone      : {p['zone_low']} — {p['zone_high']}")
+    e     = "🟢" if p["zone_type"]=="DEMAND" else "🔴"
+    dir_  = "📈 BUY Zone"  if p["zone_type"]=="DEMAND" else "📉 SELL Zone"
+    fresh = "✅ FRESH"     if p["fresh"]      else "🔁 TESTED"
+    stars = strength_stars(p["strength"])
+    return (
+        f"{e} <b>{p['pattern']} Pattern Formed!</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📊 Asset       : <b>{dn(sym)}</b>\n"
+        f"⏱ Timeframe   : <b>{tf}</b>\n"
+        f"🔷 Pattern     : <b>{p['pattern']}</b>\n"
+        f"🎯 Type        : <b>{dir_}</b>\n"
+        f"💪 Strength    : <b>{stars} ({p['strength']}/5)</b>\n"
+        f"📦 Base Count  : <b>{p['base_count']}</b>\n"
+        f"🚀 Legout Count: <b>{p['legout_count']}</b>\n"
+        f"🕯 Base Color  : <b>{p['base_color']}</b>\n"
+        f"🆕 Status      : <b>{fresh}</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📍 Proximal    : <b>{p['proximal']}</b>  ← Entry\n"
+        f"📏 Distal      : <b>{p['distal']}</b>    ← SL"
+    )
 
 def retest_msg(sym, tf, p, price):
-    e  = "🟢" if p["zone_type"]=="DEMAND" else "🔴"
-    dn = display_name(sym)
-    return (f"⚡ <b>{p['pattern']} RETEST!</b>\n"
-            f"📊 {dn} | {tf}\n"
-            f"💰 Price : <b>{price}</b>\n"
-            f"📍 Entry : <b>{p['entry']}</b>\n"
-            f"🛑 SL    : <b>{p['sl']}</b>\n"
-            f"{e} Price entered <b>{p['zone_type']}</b> zone!")
+    e     = "🟢" if p["zone_type"]=="DEMAND" else "🔴"
+    stars = strength_stars(p["strength"])
+    return (
+        f"⚡ <b>{p['pattern']} RETEST!</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📊 Asset     : <b>{dn(sym)}</b>\n"
+        f"⏱ Timeframe : <b>{tf}</b>\n"
+        f"🔷 Pattern   : <b>{p['pattern']}</b>\n"
+        f"💪 Strength  : <b>{stars} ({p['strength']}/5)</b>\n"
+        f"🔁 Status    : <b>TESTED</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"💰 Price     : <b>{price}</b>\n"
+        f"📍 Proximal  : <b>{p['proximal']}</b>  ← Entry\n"
+        f"📏 Distal    : <b>{p['distal']}</b>    ← SL\n"
+        f"{e} Price entered <b>{p['zone_type']}</b> zone!"
+    )
 
 def sl_msg(sym, tf, p, price):
-    dn = display_name(sym)
-    return (f"❌ <b>{p['pattern']} Zone INVALIDATED</b>\n"
-            f"📊 {dn} | {tf}\n"
-            f"💰 Price : <b>{price}</b>\n"
-            f"🛑 SL Hit: <b>{p['sl']}</b>")
+    return (
+        f"❌ <b>{p['pattern']} Zone INVALIDATED</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"📊 Asset     : <b>{dn(sym)}</b>\n"
+        f"⏱ Timeframe : <b>{tf}</b>\n"
+        f"🔷 Pattern   : <b>{p['pattern']}</b>\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"💰 Price     : <b>{price}</b>\n"
+        f"📏 Distal Hit: <b>{p['distal']}</b>\n"
+        f"Zone removed ✂️"
+    )
 
 def scan_symbol(sym, tf):
     df = fetch(sym, tf)
@@ -204,46 +247,48 @@ def scan_symbol(sym, tf):
             alerted.add(pk)
             active_zones[zk] = {**p}
             send(pat_msg(sym, tf, p))
-            print(f"[NEW] {display_name(sym)} {tf} {p['pattern']}")
+            print(f"[NEW] {dn(sym)} {tf} {p['pattern']} Prox:{p['proximal']} Dist:{p['distal']}")
     for zk, z in list(active_zones.items()):
         if not zk.startswith(f"{sym}_{tf}_"): continue
         bull = z["zone_type"] == "DEMAND"
         slk, rtk = zk+"_sl", zk+"_retest"
-        if (bull and price < z["sl"]) or (not bull and price > z["sl"]):
+        # SL = price closes beyond Distal
+        if (bull and close <= z["distal"]) or (not bull and close >= z["distal"]):
             if slk not in alerted:
                 alerted.add(slk)
                 send(sl_msg(sym, tf, z, price))
                 active_zones.pop(zk, None)
+        # Retest = price reaches Proximal
         elif rtk not in alerted:
-            if (bull and price <= z["entry"]) or (not bull and price >= z["entry"]):
+            if (bull and price <= z["proximal"]) or (not bull and price >= z["proximal"]):
                 alerted.add(rtk)
+                z["fresh"] = False
                 send(retest_msg(sym, tf, z, price))
 
 def scan_all():
     print(f"\n[SCAN] {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    all_lists = [NIFTY100_SYMBOLS, US100_SYMBOLS, FOREX_SYMBOLS, COMMODITY_SYMBOLS]
-    for syms in all_lists:
+    for sym in NIFTY100_SYMBOLS:
+        for tf in INDIAN_TF:
+            try: scan_symbol(sym, tf); time.sleep(0.2)
+            except Exception as e: print(f"[ERR] {sym} {tf}: {e}")
+    for syms in [US100_SYMBOLS, FOREX_SYMBOLS, COMMODITY_SYMBOLS]:
         for sym in syms:
-            for tf in ALL_TIMEFRAMES:
-                try:
-                    scan_symbol(sym, tf)
-                    time.sleep(0.2)
-                except Exception as e:
-                    print(f"[ERR] {sym} {tf}: {e}")
+            for tf in NON_INDIAN_TF:
+                try: scan_symbol(sym, tf); time.sleep(0.2)
+                except Exception as e: print(f"[ERR] {sym} {tf}: {e}")
 
 def main():
-    print("🚀 SD Alert Bot v4 Started!")
+    print("🚀 SD Alert Bot v6 Started!")
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("❌ Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID!")
-        return
-    send("🤖 <b>SD Alert Bot v4 Started!</b>\n"
-         "⏱ Timeframes: 15m 30m 75m 125m 1h 2h 4h 5h 6h 8h 10h 16h 1d 1wk\n"
-         "🇮🇳 Nifty100 | 🇺🇸 US100 | 💱 Forex | 🏅 Commodities | ₿ BTC")
+        print("❌ Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID!"); return
+    send("🤖 <b>SD Alert Bot v6 Started!</b>\n"
+         "✅ Fixed Entry/SL Logic:\n"
+         "📍 Proximal = Entry Level\n"
+         "📏 Distal = SL Level\n"
+         "Based on Base candle color!")
     while True:
-        try:
-            scan_all()
-        except Exception as e:
-            print(f"[MAIN ERR] {e}")
+        try: scan_all()
+        except Exception as e: print(f"[MAIN ERR] {e}")
         print(f"[WAIT] {SCAN_INTERVAL}s...")
         time.sleep(SCAN_INTERVAL)
 

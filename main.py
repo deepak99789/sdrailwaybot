@@ -80,7 +80,7 @@ COMMODITY_SYMBOLS = [
    
 ]
 
-TIMEFRAMES = ["15m","30m","1h","4h","1d","1wk"]
+TIMEFRAMES = ["15m","30m","1h","2h","4h","1d","1wk"]
 PERIOD_MAP = {"15m":"2d","30m":"5d","1h":"7d","4h":"15d","1d":"60d","1wk":"1y"}
 
 # Symbol display name map

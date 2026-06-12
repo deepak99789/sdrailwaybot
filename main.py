@@ -16,7 +16,6 @@ SCAN_INTERVAL    = int(os.environ.get("SCAN_INTERVAL", "60"))
 # ══════════════════════════════════
 # SYMBOL LISTS
 # ══════════════════════════════════
-
 NIFTY100_SYMBOLS = [
     "RELIANCE.NS","TCS.NS","HDFCBANK.NS","INFY.NS","ICICIBANK.NS",
     "HINDUNILVR.NS","SBIN.NS","BHARTIARTL.NS","ITC.NS","KOTAKBANK.NS",
@@ -37,7 +36,7 @@ NIFTY100_SYMBOLS = [
     "FEDERALBNK.NS","IDFCFIRSTB.NS","PERSISTENT.NS","MPHASIS.NS","COFORGE.NS",
     "LTIM.NS","OFSS.NS","ZOMATO.NS","NYKAA.NS","POLICYBZR.NS",
     "IRCTC.NS","CHOLAFIN.NS","MUTHOOTFIN.NS","BAJAJHLDNG.NS","MOTHERSON.NS",
-    "ASHOKLEY.NS","TVSMOTOR.NS","BALKRISIND.NS","JUBLFOOD.NS","PIDILITIND.NS",
+    "ASHOKLEY.NS","TVSMOTOR.NS","BALKRISIND.NS","JUBLFOOD.NS",
     "^NSEI","^BSESN"
 ]
 
@@ -47,54 +46,82 @@ US100_SYMBOLS = [
     "INTU","ISRG","AMGN","MU","LRCX","KLAC","REGN","PANW","ADI","SNPS",
     "CDNS","MRVL","CRWD","FTNT","NXPI","ORLY","ADP","MNST","CTAS","PAYX",
     "MELI","WDAY","DXCM","ODFL","FAST","ROST","BIIB","IDXX","VRSK","TEAM",
-    "CPRT","FANG","EA","ZS","ANSS","ILMN","ALGN","SIRI","DLTR","WBA",
-    "SGEN","MTCH","LCID","RIVN","ZM","DOCU","OKTA","DDOG","NET","SNOW",
-    "PLTR","COIN","RBLX","HOOD","SOFI","UPST","AFRM","ABNB","DASH","UBER",
-    "LYFT","PINS","SNAP","TWTR","SPOT","SHOP","SQ","PYPL","INTC","IBM",
-    "ORCL","CRM","NOW","VEEV","HUBS","BILL","GTLB","MDB","ESTC","CFLT",
+    "CPRT","FANG","EA","ZS","ANSS","ILMN","ALGN","DLTR","WBA","SGEN",
+    "ZM","DOCU","OKTA","DDOG","NET","SNOW","PLTR","COIN","RBLX","ABNB",
+    "DASH","UBER","PINS","SNAP","SPOT","SHOP","SQ","PYPL","INTC","IBM",
+    "ORCL","CRM","NOW","VEEV","HUBS","BILL","MDB","ESTC","CFLT","GTLB",
     "SPY","QQQ","DIA","IWM"
 ]
 
 FOREX_SYMBOLS = [
-    # Major Pairs
     "EURUSD=X","GBPUSD=X","USDJPY=X","USDCHF=X","AUDUSD=X","USDCAD=X","NZDUSD=X",
-    # Minor Pairs
     "EURGBP=X","EURJPY=X","EURCHF=X","EURAUD=X","EURCAD=X","EURNZD=X",
     "GBPJPY=X","GBPCHF=X","GBPAUD=X","GBPCAD=X","GBPNZD=X",
     "AUDJPY=X","AUDCHF=X","AUDCAD=X","AUDNZD=X",
-    "CADJPY=X","CADCHF=X",
-    "NZDJPY=X","NZDCHF=X","NZDCAD=X",
-    "CHFJPY=X",
-    
+    "CADJPY=X","CADCHF=X","NZDJPY=X","NZDCHF=X","NZDCAD=X","CHFJPY=X",
+    "USDINR=X","USDSGD=X","USDMXN=X","USDZAR=X","USDTRY=X"
 ]
 
 COMMODITY_SYMBOLS = [
-    "GC=F",    # Gold (XAUUSD)
-    "SI=F",    # Silver (XAGUSD)
-    "CL=F",    # Crude Oil WTI
-    "BZ=F",    # Brent Crude
-    "NG=F",    # Natural Gas
-    "HG=F",    # Copper
-    "BTC-USD", # Bitcoin
-    "ETH-USD", # Ethereum
-   
+    "GC=F","SI=F","CL=F","BZ=F","NG=F","HG=F","BTC-USD"
 ]
 
-TIMEFRAMES = ["15m","30m","1h","2h","4h","1d","1wk"]
-PERIOD_MAP = {"15m":"2d","30m":"5d","1h":"7d","4h":"15d","1d":"60d","1wk":"1y"}
-
-# Symbol display name map
 NAME_MAP = {
     "GC=F":"XAUUSD","SI=F":"XAGUSD","CL=F":"WTI_OIL",
-    "BZ=F":"BRENT_OIL","NG=F":"NAT_GAS","HG=F":"COPPER",
-    "BTC-USD":"BTCUSD","ETH-USD":"ETHUSD","BNB-USD":"BNBUSD",
-    "SOL-USD":"SOLUSD","XRP-USD":"XRPUSD",
-    "^NSEI":"NIFTY50","^BSESN":"SENSEX",
-    "SPY":"SP500_ETF","QQQ":"NASDAQ_ETF","DIA":"DOW_ETF","IWM":"RUSSELL_ETF"
+    "BZ=F":"BRENT","NG=F":"NAT_GAS","HG=F":"COPPER",
+    "BTC-USD":"BTCUSD","^NSEI":"NIFTY50","^BSESN":"SENSEX",
+    "SPY":"SP500","QQQ":"NASDAQ","DIA":"DOW","IWM":"RUSSELL"
 }
 
 def display_name(sym):
     return NAME_MAP.get(sym, sym.replace(".NS","").replace("=X","").replace("-USD","USD").replace("=F",""))
+
+# ══════════════════════════════════
+# CUSTOM TIMEFRAME RESAMPLING
+# ══════════════════════════════════
+# base_tf -> fetch this from yfinance
+# then resample to custom minutes
+CUSTOM_TIMEFRAMES = {
+    "15m" : {"fetch":"15m",  "resample":None,  "period":"2d"},
+    "30m" : {"fetch":"30m",  "resample":None,  "period":"5d"},
+    "75m" : {"fetch":"15m",  "resample":"75T", "period":"5d"},
+    "125m": {"fetch":"5m",   "resample":"125T","period":"5d"},
+    "1h"  : {"fetch":"1h",   "resample":None,  "period":"7d"},
+    "2h"  : {"fetch":"1h",   "resample":"2h",  "period":"10d"},
+    "4h"  : {"fetch":"1h",   "resample":"4h",  "period":"15d"},
+    "5h"  : {"fetch":"1h",   "resample":"5h",  "period":"20d"},
+    "6h"  : {"fetch":"1h",   "resample":"6h",  "period":"20d"},
+    "8h"  : {"fetch":"1h",   "resample":"8h",  "period":"30d"},
+    "10h" : {"fetch":"1h",   "resample":"10h", "period":"30d"},
+    "16h" : {"fetch":"1h",   "resample":"16h", "period":"40d"},
+    "1d"  : {"fetch":"1d",   "resample":None,  "period":"60d"},
+    "1wk" : {"fetch":"1wk",  "resample":None,  "period":"1y"},
+}
+
+ALL_TIMEFRAMES = list(CUSTOM_TIMEFRAMES.keys())
+
+def resample_df(df, rule):
+    """Resample OHLCV dataframe to custom timeframe"""
+    df_resampled = df.resample(rule).agg({
+        "Open" : "first",
+        "High" : "max",
+        "Low"  : "min",
+        "Close": "last",
+        "Volume":"sum"
+    }).dropna()
+    return df_resampled
+
+def fetch(symbol, tf_key):
+    cfg = CUSTOM_TIMEFRAMES[tf_key]
+    try:
+        df = yf.Ticker(symbol).history(period=cfg["period"], interval=cfg["fetch"])
+        if df.empty: return None
+        df = df[["Open","High","Low","Close","Volume"]].dropna()
+        if cfg["resample"]:
+            df = resample_df(df, cfg["resample"])
+        return df if len(df) >= 3 else None
+    except:
+        return None
 
 # ── State ──
 alerted      = set()
@@ -126,13 +153,6 @@ def detect_latest(df):
     return {"pattern":pat,"zone_type":zt,"entry":round(ep,6),"sl":round(sl,6),
             "zone_high":round(bs["High"],6),"zone_low":round(bs["Low"],6),
             "legout_time":str(lo.name)}
-
-def fetch(symbol, tf):
-    try:
-        df = yf.Ticker(symbol).history(period=PERIOD_MAP.get(tf,"7d"), interval=tf)
-        if df.empty: return None
-        return df[["Open","High","Low","Close","Volume"]].dropna()
-    except: return None
 
 def send(text):
     try:
@@ -185,49 +205,40 @@ def scan_symbol(sym, tf):
             active_zones[zk] = {**p}
             send(pat_msg(sym, tf, p))
             print(f"[NEW] {display_name(sym)} {tf} {p['pattern']}")
-    to_delete = []
     for zk, z in list(active_zones.items()):
         if not zk.startswith(f"{sym}_{tf}_"): continue
         bull = z["zone_type"] == "DEMAND"
-        slk  = zk + "_sl"
-        rtk  = zk + "_retest"
+        slk, rtk = zk+"_sl", zk+"_retest"
         if (bull and price < z["sl"]) or (not bull and price > z["sl"]):
             if slk not in alerted:
                 alerted.add(slk)
                 send(sl_msg(sym, tf, z, price))
-                to_delete.append(zk)
+                active_zones.pop(zk, None)
         elif rtk not in alerted:
             if (bull and price <= z["entry"]) or (not bull and price >= z["entry"]):
                 alerted.add(rtk)
                 send(retest_msg(sym, tf, z, price))
-    for zk in to_delete:
-        active_zones.pop(zk, None)
 
 def scan_all():
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"\n[SCAN] {now}")
+    print(f"\n[SCAN] {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     all_lists = [NIFTY100_SYMBOLS, US100_SYMBOLS, FOREX_SYMBOLS, COMMODITY_SYMBOLS]
     for syms in all_lists:
         for sym in syms:
-            for tf in TIMEFRAMES:
+            for tf in ALL_TIMEFRAMES:
                 try:
                     scan_symbol(sym, tf)
-                    time.sleep(0.3)
+                    time.sleep(0.2)
                 except Exception as e:
                     print(f"[ERR] {sym} {tf}: {e}")
 
 def main():
-    print("🚀 SD Alert Bot v3 Started!")
+    print("🚀 SD Alert Bot v4 Started!")
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         print("❌ Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID!")
         return
-    send("🤖 <b>SD Alert Bot v3 Started!</b>\n"
-         "📊 Monitoring:\n"
-         "🇮🇳 Nifty 100 Stocks\n"
-         "🇺🇸 US Top 100 Stocks\n"
-         "💱 Forex Major + Minor + Cross\n"
-         "🏅 Commodities (Gold, Silver, Oil)\n"
-         "₿ Crypto (BTC, ETH, SOL...)")
+    send("🤖 <b>SD Alert Bot v4 Started!</b>\n"
+         "⏱ Timeframes: 15m 30m 75m 125m 1h 2h 4h 5h 6h 8h 10h 16h 1d 1wk\n"
+         "🇮🇳 Nifty100 | 🇺🇸 US100 | 💱 Forex | 🏅 Commodities | ₿ BTC")
     while True:
         try:
             scan_all()
